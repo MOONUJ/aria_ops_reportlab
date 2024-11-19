@@ -1,12 +1,5 @@
 #!/usr/bin/python
 
-"""
-# data-collect.py contain the python program to gather Metrics from vROps. Before you run this script
-# set-config.py should be run once to set the environment
-# Author Sajal Debnath <sdebnath@vmware.com> 
-# Modified to handle multiple configurations, Korean timestamp, using nagini API methods
-"""
-
 import nagini
 import requests
 import json
@@ -38,10 +31,8 @@ def get_korean_timestamp():
 def get_resource_properties(vrops, resource_id, property_keys):
     properties = {}
     try:
-        # nagini의 get_resource_properties API 사용 시 id 파라미터 추가
         resource_data = vrops.get_resource_properties(resourceId=resource_id, id=resource_id)
         
-        # 요청된 속성 키에 대한 값만 필터링
         if 'property' in resource_data:
             for prop in resource_data['property']:
                 if prop['name'] in property_keys:
@@ -55,7 +46,6 @@ def get_metric_stats(vrops, resource_id, metric_keys, sampleno):
     stats = {}
     try:
         for key in metric_keys:
-            # nagini의 get_latest_stats API 사용
             allvalues = vrops.get_latest_stats(resourceId=resource_id, statKey=[key], maxSamples=sampleno, id=resource_id)
             
             if allvalues["values"]:
@@ -82,11 +72,10 @@ def get_resource_data(vrops, resource, metric_keys, property_keys, sampleno):
     resourcedata = {}
     name = resource['identifier']
     
-    # 메트릭과 프로퍼티 데이터를 각각의 nagini API로 수집
     stats = get_metric_stats(vrops, name, metric_keys, sampleno)
     properties = get_resource_properties(vrops, name, property_keys)
     
-    if stats or properties:  # 메트릭이나 속성 데이터가 있는 경우만 추가
+    if stats or properties:
         resourcedata["identifier"] = name
         resourcedata["name"] = resource['resourceKey']['name']
         resourcedata["stats"] = stats
@@ -94,25 +83,28 @@ def get_resource_data(vrops, resource, metric_keys, property_keys, sampleno):
     
     return resourcedata
 
-def process_configuration(config):
-    adapter = config["adapterKind"]
-    resourceknd = config["resourceKind"]
-    servername = config["server"]["name"]
-    passwd = base64.b64decode(config["server"]["password"].encode('utf-8')).decode('utf-8')
-    uid = config["server"]["userid"]
-    sampleno = config["sampleno"]
-    metric_keys = config.get("metricKeys", [])
-    property_keys = config.get("propertyKeys", [])
+def get_vrops_connection(server_config):
+    passwd = base64.b64decode(server_config["password"].encode('utf-8')).decode('utf-8')
+    return nagini.Nagini(
+        host=server_config["name"],
+        user_pass=(server_config["userid"], passwd)
+    )
+
+def process_configuration(collection, server_config):
+    adapter = collection["adapterKind"]
+    resourceknd = collection["resourceKind"]
+    sampleno = collection["sampleno"]
+    metric_keys = collection.get("metricKeys", [])
+    property_keys = collection.get("propertyKeys", [])
     
-    vrops = nagini.Nagini(host=servername, user_pass=(uid, passwd))
+    vrops = get_vrops_connection(server_config)
     
     outdata = []
-    # 리소스 목록 가져오기
     resources = vrops.get_resources(resourceKind=resourceknd, adapterKindKey=adapter)['resourceList']
     
     for resource in resources:
         resource_data = get_resource_data(vrops, resource, metric_keys, property_keys, sampleno)
-        if resource_data:  # 데이터가 있는 경우만 추가
+        if resource_data:
             outdata.append(resource_data)
     
     outstat = {
@@ -121,7 +113,8 @@ def process_configuration(config):
         "resourceKind": resourceknd,
         "adapterKind": adapter,
         "metricKeys": metric_keys,
-        "propertyKeys": property_keys
+        "propertyKeys": property_keys,
+        "server": server_config["name"]
     }
     
     return outstat
@@ -133,12 +126,16 @@ def main():
     fullpath = path + "/" + "config.json"
     
     with open(fullpath) as data_file:
-        configs = json.load(data_file)
+        config = json.load(data_file)
+    
+    # Create server lookup dictionary
+    servers = {server["name"]: server for server in config["servers"]}
     
     all_results = []
     
-    for config in configs:
-        result = process_configuration(config)
+    for collection in config["collections"]:
+        server_config = servers[collection["serverId"]]
+        result = process_configuration(collection, server_config)
         all_results.append(result)
     
     outpath = path + "/" + "metric-data.json"

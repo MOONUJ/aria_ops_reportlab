@@ -1,6 +1,7 @@
 # Local .terraform directories
 **/.terraform/*
-
+**/.json/*
+*.json
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -32,3 +33,5 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+reportlab/goodmit.png
