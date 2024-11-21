@@ -439,7 +439,31 @@ add_data_table.setStyle(TableStyle({
 elements.append(list_data_table)
 elements.append(Spacer(1,30))
 elements.append(add_data_table)
+elements.append(PageBreak())
 
+# 4 페이지 생성
+elements.append(Paragraph("관리서버(vCenter) 설정 및 상태 확인",styles['Title']))
+elements.append(PageBreak())
+
+# 5 페이지 생성
+elements.append(Paragraph("클러스터 기능 설정 상태 확인",styles['Title']))
+elements.append(PageBreak())
+
+# 6 페이지 생성
+elements.append(Paragraph("ESXi 서비스 및 설정 상태 확인",styles['Title']))
+elements.append(PageBreak())
+
+# 7 페이지 생성
+elements.append(Paragraph("가상 시스템 스냅샷 보유 상태 및 VM Tools 상태 확인",styles['Title']))
+elements.append(PageBreak())
+
+# 7 페이지 생성
+elements.append(Paragraph("클러스터 및 호스트 리소스 사용률 상태 확인",styles['Title']))
+elements.append(PageBreak())
+
+# 7 페이지 생성
+elements.append(Paragraph("데이터스토어 사용율 상태 확인",styles['Title']))
+elements.append(PageBreak())
 # PDF 작성
 doc.build(elements)
 print(f"PDF 생성 완료: {pdf_path}")
