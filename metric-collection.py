@@ -32,10 +32,10 @@ def get_resource_properties(vrops, resource_id, property_keys):
     properties = {}
     try:
         resource_data = vrops.get_resource_properties(resourceId=resource_id, id=resource_id)
-        
+    # After test remove #    
         if 'property' in resource_data:
             for prop in resource_data['property']:
-            #    if prop['name'] in property_keys:
+    #            if prop['name'] in property_keys:
                     properties[prop['name']] = prop['value']
     except Exception as e:
         print(f"Error getting properties for resource {resource_id}: {str(e)}")
@@ -47,7 +47,7 @@ def get_metric_stats(vrops, resource_id, metric_keys, sampleno):
     try:
         for key in metric_keys:
             # After test add statKey=[key]
-            allvalues = vrops.get_latest_stats(resourceId=resource_id, maxSamples=sampleno, id=resource_id) 
+            allvalues = vrops.get_latest_stats(resourceId=resource_id,maxSamples=sampleno, id=resource_id) 
             
             if allvalues["values"]:
                 if int(sampleno) == 1:
