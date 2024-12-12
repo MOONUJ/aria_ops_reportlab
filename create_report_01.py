@@ -646,6 +646,9 @@ def generate_pdf():
 
     # 6 페이지 생성
     elements.append(Paragraph("ESXi 서비스 및 설정 상태 확인",styles['Title']))
+    esxi_data = [
+        ['이름', 'IP']
+    ]
     elements.append(PageBreak())
 
     # 7 페이지 생성
