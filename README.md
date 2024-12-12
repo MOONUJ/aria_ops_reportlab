@@ -8,10 +8,10 @@
 
 # 실행
 VMware에서 Aria Operations API를 쉽게 사용할 수 있도록 python Client Library를 제공하였습니다.
-git clone으로 스크립트와 파일 다운로드 하여 vcops-python 디렉토리에 있는 setup.py을 실행하여 python client를 설치 합니다.
+먼저, 해당 repository를 다운로드 하여 vcops-python 디렉토리에 있는 setup.py을 실행하여 python client를 설치 합니다.
 
 이 후 실행 할 스크립트는 3가지 입니다. 'set-config.py', 'metric-collection.py', 'create_report_01.py'
-먼저 set-config.py 스크립트를 실행하여 수집하고자 하는 Aria Operations의 정보, 어댑터 정보, 리소스 Kind, metric 또는 property 값을 지정합니다.
+set-config.py 스크립트를 실행하여 수집하고자 하는 Aria Operations의 정보, 어댑터 정보, 리소스 Kind, metric 또는 property 값을 지정합니다.
 그럼 다음 'metric-collection.py'을 실행하여 메트릭 값을 수집하고 'create_report_01.py'을 실행하여 pdf 형식의 보고서를 출력합니다.
 
 참조할 만한 추가 리소스 문서들을 공유합니다.
